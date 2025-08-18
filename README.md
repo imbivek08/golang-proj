@@ -48,3 +48,23 @@ The project is still under development, with the goal of creating a scalable bac
 
 ## Setup & Running
 
+### Step 1: Create Environment File
+Create a `.env` file in the root directory with the following variables:
+
+```env
+DB_HOST=localhost
+DB_USER=youruser
+DB_PASS=yourpass
+DB_NAME=authdb
+DB_SSLMODE=disable
+DB_PORT=5432
+
+APP_PORT=8000
+
+### Step 2: Run with Docker Compose 
+docker compose up --build
+
+### Step 3: Run Without Docker
+
+go mod tidy
+go run main.go
