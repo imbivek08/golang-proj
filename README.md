@@ -60,6 +60,7 @@ DB_SSLMODE=disable
 DB_PORT=5432
 
 APP_PORT=8000
+---
 
 ### Step 2: Run with Docker Compose 
 docker compose up --build
