@@ -66,9 +66,11 @@ APP_PORT=8000
 ### Step 2: Run with Docker Compose 
 ```bash
 docker compose up --build
+```
+---
 
 ### Step 3: Run Without Docker
-```
+```bash
 go mod tidy
 go run main.go
 ```
