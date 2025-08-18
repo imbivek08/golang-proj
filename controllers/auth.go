@@ -22,7 +22,7 @@ func Register(c *gin.Context) {
 
 	hashedPassword, _ := utils.HashPassword(input.Password)
 
-	user := models.User{Username: input.Username, Password: hashedPassword}
+	user := models.User{Username: input.Username, Password: hashedPassword, Email: input.Email}
 
 	result := config.DB.Create(&user)
 
@@ -42,8 +42,7 @@ func Login(c *gin.Context) {
 		return
 	}
 	var user models.User
-	config.DB.First(&user, "usernmae = ?", input.Username)
-
+	config.DB.First(&user, "username = ?", input.Username)
 	if !utils.CheckPassword(input.Password, user.Password) {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid credentials"})
 		return
@@ -52,6 +51,7 @@ func Login(c *gin.Context) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"user_id": user.ID,
 		"exp":     time.Now().Add(time.Hour * 72).Unix(),
+		"role":    user.Role,
 	})
 	tokenString, _ := token.SignedString(jwtSecret)
 

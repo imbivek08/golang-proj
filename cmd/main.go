@@ -3,7 +3,6 @@ package main
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/imbivek08/web-service/config"
-	"github.com/imbivek08/web-service/models"
 	"github.com/imbivek08/web-service/routes"
 )
 
@@ -11,7 +10,11 @@ func main() {
 	router := gin.Default()
 
 	config.ConnectDatabase()
-	config.DB.AutoMigrate(&models.User{})
+	//public route
 	routes.AuthRutes(router)
-	router.Run(":8080")
+	//protected route
+	routes.UserRoutes(router)
+	routes.ProductRoute(router)
+	routes.OrderRoutes(router)
+	router.Run(":8000")
 }
