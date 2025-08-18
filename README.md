@@ -60,12 +60,21 @@ DB_SSLMODE=disable
 DB_PORT=5432
 
 APP_PORT=8000
+```
 ---
 
 ### Step 2: Run with Docker Compose 
+```bash
 docker compose up --build
 
 ### Step 3: Run Without Docker
-
+```
 go mod tidy
 go run main.go
+```
+
+---
+
+⚡ This intro makes it clear the backend is **for an e-commerce platform** and still a **work in progress**.  
+
+Do you also want me to include a **sample `docker-compose.yml`** in the README so that new contributors can copy-paste and spin up the whole local environment instantly?
