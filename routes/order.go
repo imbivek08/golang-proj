@@ -10,7 +10,7 @@ func OrderRoutes(r *gin.Engine) {
 	orderGroup := r.Group("/order")
 	orderGroup.Use(middlewares.AuthMiddleware())
 	{
-		orderGroup.POST("/", controllers.CreateOrder)
+		orderGroup.POST("/", controllers.CreateOrderHandler())
 		orderGroup.DELETE("/delete", controllers.DeleteOrder)
 		orderGroup.PUT("/update", controllers.UpdateOrder)
 	}
