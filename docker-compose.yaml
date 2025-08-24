@@ -1,0 +1,34 @@
+version: "3.9"
+
+services:
+  db:
+    image: postgres:15
+    container_name: auth_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: youruser
+      POSTGRES_PASSWORD: yourpass
+      POSTGRES_DB: authdb
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432" 
+
+  backend:
+    build: 
+      context: .
+    container_name: auth_backend
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      - DB_HOST=db           
+      - DB_PORT=5432
+      - DB_USER=youruser
+      - DB_PASS=yourpass
+      - DB_NAME=authdb
+    depends_on:
+      - db
+
+volumes:
+  pgdata:
