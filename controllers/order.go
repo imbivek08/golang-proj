@@ -1,28 +1,76 @@
 package controllers
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 	"github.com/imbivek08/web-service/config"
 	"github.com/imbivek08/web-service/models"
+	"gorm.io/gorm"
 )
 
-func CreateOrder(c *gin.Context) {
-	var orderInput models.Order
-	if err := c.ShouldBindJSON(&orderInput); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid data format"})
-		return
-	}
-	//totalPrice := orderInput.Quantity*
-	order := models.Order{UserID: orderInput.UserID, ProductID: orderInput.ProductID, Quantity: orderInput.Quantity}
-	result := config.DB.Create(&order)
+type CreateOrderRequest struct {
+	Items []struct {
+		ProductID uint `json:"product_id"`
+		Quantity  int  `json:"quantity"`
+	} `json:"items"`
+}
 
-	if result.Error != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to place order"})
-		return
+func CreateOrderHandler() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		var req CreateOrderRequest
+		if err := c.ShouldBindJSON(&req); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+		userID := c.MustGet("userID").(uint)
+		order := models.Order{
+			UserID: userID,
+		}
+
+		err := config.DB.Transaction(func(tx *gorm.DB) error {
+			if err := tx.Create(&order).Error; err != nil {
+				return err
+			}
+
+			var total float64
+			for _, item := range req.Items {
+				var product models.Product
+				if err := tx.First(&product, item.ProductID).Error; err != nil {
+					return fmt.Errorf("product %d not found", item.ProductID)
+				}
+				fmt.Println(product.Price)
+				subtotal := float64(item.Quantity) * product.Price
+				total += subtotal
+
+				orderItem := models.OrderItem{
+					OrderID:   order.ID,
+					ProductID: product.ID,
+					Quantity:  item.Quantity,
+					Subtotal:  subtotal,
+				}
+
+				if err := tx.Create(&orderItem).Error; err != nil {
+					return err
+				}
+			}
+
+			order.TotalPrice = total
+			if err := tx.Save(&order).Error; err != nil {
+				return err
+			}
+
+			return nil
+		})
+
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+
+		c.JSON(http.StatusCreated, order)
 	}
-	c.JSON(http.StatusOK, gin.H{"message": "Order placed successfully"})
 }
 
 func DeleteOrder(c *gin.Context) {
