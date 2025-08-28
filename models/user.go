@@ -15,4 +15,5 @@ type User struct {
 	Role      string `gorm:"default:'user'"`
 	CreatedAt time.Time
 	Orders    []Order `gorm:"foreignKey:UserID"`
+	Cart      []Cart  `gorm:"foreignKey:UserID"`
 }
