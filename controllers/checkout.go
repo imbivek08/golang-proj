@@ -46,7 +46,7 @@ func CheckoutHandler() gin.HandlerFunc {
 				orderItem := models.OrderItem{
 					OrderID:   order.ID,
 					ProductID: cartItem.ProductID,
-					Quantity:  cartItem.Quantity,
+					Quantity:  int(cartItem.Quantity),
 					Subtotal:  subtotal,
 				}
 				if err := tx.Create(&orderItem).Error; err != nil {
