@@ -14,6 +14,13 @@ services:
     ports:
       - "5432:5432" 
 
+  redis:
+    image: redis:7
+    container_name: auth_redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+
   backend:
     build: 
       context: .
@@ -27,8 +34,11 @@ services:
       - DB_USER=youruser
       - DB_PASS=yourpass
       - DB_NAME=authdb
+      - REDIS_HOST=redis      # Add this so backend knows Redis hostname
+      - REDIS_PORT=6379
     depends_on:
       - db
+      - redis
 
 volumes:
   pgdata:
